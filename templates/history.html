@@ -68,12 +68,16 @@
             <div class="value">EC: {{ "%.3f"|format(reading.ec_ms_cm) }} mS/cm</div>
             <div class="value">PPM: {{ reading.ppm }}</div>
             <div class="value">Salt: {{ "%.2f"|format(reading.salt_percent) }}%</div>
-            <div class="value">Temperature: {{ "%.1f"|format(reading.water_temp_c) }}°C</div>
+            <div class="value">Water Temp: {{ "%.1f"|format(reading.water_temp_c * 1.8 + 32) }}°F</div>
             {% if reading.water_height_in is not none and reading.water_height_in > 0 %}
             <div class="value">Water Height: {{ "%.1f"|format(reading.water_height_in) }} inches</div>
             {% endif %}
             {% if reading.water_gallons is not none and reading.water_gallons > 0 %}
             <div class="value">Water Volume: {{ "%.1f"|format(reading.water_gallons) }} gallons</div>
+            {% endif %}
+            {% if reading.outside_temp_f is not none %}
+            <div class="value">Outside Temp: {{ "%.1f"|format(reading.outside_temp_f) }}°F</div>
+            <div class="value">Humidity: {{ reading.humidity }}%</div>
             {% endif %}
         </div>
         {% endfor %}

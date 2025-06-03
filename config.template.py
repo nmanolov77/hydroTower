@@ -5,3 +5,9 @@ DB_CONFIG = {
     "host": "localhost",
     "port": 5432,
 }
+
+WEATHER_CONFIG = {
+    "api_key": "your_openweather_api_key",
+    "zip_code": "your_zip_code_here",
+    "country_code": "us"
+}

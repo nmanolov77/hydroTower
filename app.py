@@ -3,10 +3,34 @@ from datetime import datetime
 import psycopg2
 import pandas as pd
 import pytz
-from config import DB_CONFIG
+import requests
+from config import DB_CONFIG, WEATHER_CONFIG
 
 now = datetime.now().replace(microsecond=0)
 app = Flask(__name__)
+
+def get_current_weather():
+    url = "http://api.openweathermap.org/data/2.5/weather"
+    params = {
+        "zip": f"{WEATHER_CONFIG['zip_code']},{WEATHER_CONFIG['country_code']}",
+        "appid": WEATHER_CONFIG['api_key'],
+        "units": "imperial"  # Changed from metric to imperial for Fahrenheit
+    }
+    
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        data = response.json()
+        
+        return {
+            "temp_f": data["main"]["temp"],  # Now returns Fahrenheit
+            "humidity": data["main"]["humidity"],
+            "conditions": data["weather"][0]["main"],
+            "wind_speed": data["wind"]["speed"]  # Note: This will now be in mph
+        }
+    except Exception as e:
+        print(f"Weather API error: {e}")
+        return None
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -20,14 +44,24 @@ def index():
             water_temp_c = float(request.form.get("water_temp_c"))
             water_height_in = float(request.form.get("water_height_in", 0))
             water_gallons = height_to_gallons(water_height_in)
+            weather = get_current_weather()
 
             with psycopg2.connect(**DB_CONFIG) as conn:
                 with conn.cursor() as cur:
                     cur.execute("""
                         INSERT INTO tower_readings 
-                        (date, ph, ec_ms_cm, ppm, salt_percent, water_temp_c, water_height_in, water_gallons)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                    """, (now, ph, ec, ppm, salt_percent, water_temp_c, water_height_in, water_gallons))
+                        (date, ph, ec_ms_cm, ppm, salt_percent, water_temp_c, 
+                         water_height_in, water_gallons, outside_temp_f,  # Changed from outside_temp_c 
+                         humidity, weather_conditions, wind_speed)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """, (
+                        now, ph, ec, ppm, salt_percent, water_temp_c, 
+                        water_height_in, water_gallons,
+                        weather["temp_f"] if weather else None,  # Changed from temp_c
+                        weather["humidity"] if weather else None,
+                        weather["conditions"] if weather else None,
+                        weather["wind_speed"] if weather else None
+                    ))
                 conn.commit()
 
         except (ValueError, TypeError) as e:
