@@ -3,18 +3,10 @@ from datetime import datetime
 import psycopg2
 import pandas as pd
 import pytz
+from config import DB_CONFIG
 
 now = datetime.now().replace(microsecond=0)
 app = Flask(__name__)
-
-# Update these to your actual DB credentials
-DB_CONFIG = {
-    "dbname": "hydroTower",
-    "user": "postgres",
-    "password": "postgres",
-    "host": "localhost",  # or your LAN IP if connecting from another device
-    "port": 5432,
-}
 
 @app.route("/", methods=["GET", "POST"])
 def index():
