@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reading History</title>
+    <style>
+        :root {
+            --naval-dark: #2a3a33;
+            --naval: #40634a;
+            --naval-light: #88a37a;
+            --text-light: #d9e4dd;
+            --text-dark: #0d1b12;
+        }
+
+        body {
+            background: var(--naval-dark);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .nav-bar {
+            background: var(--naval);
+            padding: 1rem;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .nav-bar a {
+            color: var(--text-light);
+            text-decoration: none;
+            margin-right: 20px;
+        }
+
+        .reading-card {
+            background: var(--naval);
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .value {
+            font-size: 1.2em;
+            margin: 5px 0;
+        }
+
+        .timestamp {
+            color: var(--naval-light);
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <a href="/">New Reading</a>
+        <a href="/history">History</a>
+    </div>
+
+    <div class="container">
+        {% for reading in readings %}
+        <div class="reading-card">
+            <div class="timestamp">{{ reading.date.strftime('%Y-%m-%d %I:%M %p %Z') }}</div>
+            <div class="value">pH: {{ "%.2f"|format(reading.ph) }}</div>
+            <div class="value">EC: {{ "%.3f"|format(reading.ec_ms_cm) }} mS/cm</div>
+            <div class="value">PPM: {{ reading.ppm }}</div>
+            <div class="value">Salt: {{ "%.2f"|format(reading.salt_percent) }}%</div>
+            <div class="value">Temperature: {{ "%.1f"|format(reading.water_temp_c) }}°C</div>
+            {% if reading.water_height_in is not none and reading.water_height_in > 0 %}
+            <div class="value">Water Height: {{ "%.1f"|format(reading.water_height_in) }} inches</div>
+            {% endif %}
+            {% if reading.water_gallons is not none and reading.water_gallons > 0 %}
+            <div class="value">Water Volume: {{ "%.1f"|format(reading.water_gallons) }} gallons</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hydro Tower Data Entry</title>
+  <style>
+    :root {
+      --naval-dark: #2a3a33;
+      --naval: #40634a;
+      --naval-light: #88a37a;
+      --text-light: #d9e4dd;
+      --text-dark: #0d1b12;
+    }
+
+    /* Modify body styles to allow scrolling */
+    body, html {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;  /* Changed from height: 100% */
+      background: var(--naval-dark);
+      color: var(--text-light);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      /* Remove overflow: hidden */
+    }
+
+    /* Update main-wrapper for better mobile handling */
+    .main-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 2rem; /* Add padding at bottom for mobile */
+    }
+
+    .container {
+      background: var(--naval);
+      padding: 2rem 3rem;
+      border-radius: 12px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+      position: relative;
+      z-index: 10;
+      width: 320px;
+      max-width: 90%; /* Prevent container from overflowing on mobile */
+      margin: 0 20px; /* Add some margin on sides */
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--text-light);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    label {
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      display: block;
+      color: var(--text-light);
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 0.45rem 0.6rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      color: var(--naval-dark);
+      background: var(--text-light);
+      box-sizing: border-box;
+      transition: box-shadow 0.2s ease-in-out;
+    }
+    input[type="number"]:focus {
+      outline: none;
+      box-shadow: 0 0 6px var(--naval-light);
+    }
+
+    button {
+      margin-top: 0.5rem;
+      background-color: var(--naval-light);
+      border: none;
+      border-radius: 6px;
+      padding: 0.55rem 0;
+      color: var(--naval-dark);
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #a1b78b;
+    }
+
+    /* Bubble animation */
+
+    .bubble {
+      position: fixed; /* Change from absolute to fixed */
+      top: -100px; /* start above */
+      background: var(--naval-light);
+      opacity: 0.3;
+      border-radius: 50%;
+      animation-name: fall;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.3;
+      }
+      100% {
+        transform: translateY(110vh) scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    .nav-bar {
+      width: 100%;
+      background: var(--naval);
+      padding: 1rem;
+      margin-bottom: 20px;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    .nav-bar a {
+        color: var(--text-light);
+        text-decoration: none;
+        margin: 0 10px;
+        font-weight: 600;
+    }
+
+    .nav-bar a:hover {
+        color: var(--naval-light);
+    }
+  </style>
+</head>
+<body>
+  <div class="main-wrapper">
+    <div class="nav-bar">
+      <a href="/">New Reading</a>
+      <a href="/history">History</a>
+    </div>
+    <div class="container">
+      <h1>Hydro Tower Readings</h1>
+      <form method="POST" action="/">
+        <label for="ph">pH</label>
+        <input type="number" step="0.01" name="ph" id="ph" required />
+
+        <label for="ec_ms_cm">EC (µS/cm)</label>
+        <input type="number" step="0.001" name="ec_ms_cm" id="ec_ms_cm" required />
+
+        <label for="ppm">PPM</label>
+        <input type="number" step="0.1" name="ppm" id="ppm" required />
+
+        <label for="salt_percent">Salt %</label>
+        <input type="number" step="0.01" name="salt_percent" id="salt_percent" required />
+
+        <label for="water_temp_c">Water Temp (°C)</label>
+        <input type="number" step="0.1" name="water_temp_c" id="water_temp_c" required />
+        
+        <label for="water_height_in">Water Height (inches):</label>
+        <input type="number" step="0.1" id="water_height_in" name="water_height_in" required>
+
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Generate many falling bubbles with random positions and sizes
+    const numBubbles = 40;
+
+    for(let i = 0; i < numBubbles; i++) {
+      const bubble = document.createElement('div');
+      bubble.classList.add('bubble');
+      const size = Math.random() * 12 + 6; // 6 to 18px
+      bubble.style.width = `${size}px`;
+      bubble.style.height = `${size}px`;
+      bubble.style.left = `${Math.random() * 100}vw`;
+      bubble.style.animationDuration = `${(Math.random() * 10) + 8}s`; // 8 to 18 seconds
+      bubble.style.animationDelay = `${-Math.random() * 18}s`; // start times spread out
+      document.body.appendChild(bubble);
+    }
+
+    document.getElementById('ec_ms_cm').addEventListener('input', function(e) {
+        // Standard conversion factor for hydroponic nutrients
+        const ppm = Math.round(parseFloat(e.target.value) * 500);
+        document.getElementById('ppm').value = ppm;
+    });
+  </script>
+</body>
+</html>
