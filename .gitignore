@@ -1,3 +1,12 @@
+# Configuration files with sensitive data
 config.py
+
+# Python cache files
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Environment files
+.env
+venv/
