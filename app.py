@@ -6,7 +6,6 @@ import pytz
 import requests
 from config import DB_CONFIG, WEATHER_CONFIG
 
-now = datetime.now().replace(microsecond=0)
 app = Flask(__name__)
 
 def get_current_weather():
@@ -36,6 +35,10 @@ def get_current_weather():
 def index():
     if request.method == "POST":
         try:
+            # Get current time in Eastern timezone
+            eastern = pytz.timezone('America/New_York')
+            now = datetime.now(eastern).replace(microsecond=0)
+
             ph = float(request.form.get("ph"))
             ec_raw = float(request.form.get("ec_ms_cm"))
             ec = ec_raw / 1000  # convert to mS/cm for DB
@@ -51,13 +54,13 @@ def index():
                     cur.execute("""
                         INSERT INTO tower_readings 
                         (date, ph, ec_ms_cm, ppm, salt_percent, water_temp_c, 
-                         water_height_in, water_gallons, outside_temp_f,  # Changed from outside_temp_c 
+                         water_height_in, water_gallons, outside_temp_f,
                          humidity, weather_conditions, wind_speed)
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """, (
                         now, ph, ec, ppm, salt_percent, water_temp_c, 
                         water_height_in, water_gallons,
-                        weather["temp_f"] if weather else None,  # Changed from temp_c
+                        weather["temp_f"] if weather else None,
                         weather["humidity"] if weather else None,
                         weather["conditions"] if weather else None,
                         weather["wind_speed"] if weather else None
@@ -95,7 +98,8 @@ def history():
     with psycopg2.connect(**DB_CONFIG) as conn:
         query = """
             SELECT date, ph, ec_ms_cm, ppm, salt_percent, water_temp_c, 
-                   water_height_in, water_gallons
+                   water_height_in, water_gallons, outside_temp_f,
+                   humidity, weather_conditions, wind_speed
             FROM tower_readings 
             ORDER BY date DESC 
             LIMIT 50
